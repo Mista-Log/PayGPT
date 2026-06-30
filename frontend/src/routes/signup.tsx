@@ -14,7 +14,7 @@ function SignupPage() {
         <form onSubmit={(e) => e.preventDefault()} className="mt-8 space-y-4 rounded-xl border border-border bg-card p-6">
           <Field label="Full name" placeholder="Ada Lovelace" />
           <Field label="Business name (optional)" placeholder="Northwind Co." />
-          <Field label="Work email" type="email" placeholder="you@company.com" />
+          <Field label="Email" type="email" placeholder="you@wxample.com" />
           <Field label="Password" type="password" placeholder="At least 8 characters" />
           <button className="w-full rounded-md bg-primary py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90">
             Create account
