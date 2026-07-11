@@ -8,6 +8,8 @@ import LoginPage from "./routes/login";
 import PaymentsPage from "./routes/payments";
 import PricingPage from "./routes/pricing";
 import SignupPage from "./routes/signup";
+import ProtectedRoute from "@/components/protected-route";
+
 
 function NotFound() {
   return (
@@ -31,18 +33,25 @@ function NotFound() {
   );
 }
 
+
 export default function App() {
   return (
     <Routes>
+      {/* Public Routes */}
       <Route path="/" element={<LandingPage />} />
-      <Route path="/chat" element={<ChatPage />} />
-      <Route path="/docs" element={<DocsPage />} />
-      <Route path="/insights" element={<InsightsPage />} />
-      <Route path="/invoices" element={<InvoicesPage />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/payments" element={<PaymentsPage />} />
-      <Route path="/pricing" element={<PricingPage />} />
       <Route path="/signup" element={<SignupPage />} />
+      <Route path="/pricing" element={<PricingPage />} />
+      <Route path="/docs" element={<DocsPage />} />
+
+      {/* Protected Routes */}
+      <Route element={<ProtectedRoute />}>
+        <Route path="/chat" element={<ChatPage />} />
+        <Route path="/payments" element={<PaymentsPage />} />
+        <Route path="/insights" element={<InsightsPage />} />
+        <Route path="/invoices" element={<InvoicesPage />} />
+      </Route>
+
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
