@@ -1,9 +1,63 @@
-import { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { PageShell } from "@/components/page-shell";
+import { signup } from "@/api/auth";
+import { Link, useNavigate } from "react-router-dom";
 
 
 function SignupPage() {
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    full_name: "",
+    business_name: "",
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
+    e.preventDefault();
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const data = await signup(formData);
+
+      console.log("Signup successful:", data);
+
+      navigate("/login", {
+        state: {
+          message: "Account created successfully! Please log in.",
+        },
+      });
+
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Something went wrong.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   useEffect(() => { document.title = 'Create account — PayGPT'; }, []);
   return (
     <PageShell>
@@ -11,13 +65,53 @@ function SignupPage() {
         <h1 className="text-4xl">Create your account.</h1>
         <p className="mt-2 text-sm text-muted-foreground">30 days free. No card required.</p>
 
-        <form onSubmit={(e) => e.preventDefault()} className="mt-8 space-y-4 rounded-xl border border-border bg-card p-6">
-          <Field label="Full name" placeholder="Ada Lovelace" />
-          <Field label="Business name (optional)" placeholder="Northwind Co." />
-          <Field label="Email" type="email" placeholder="you@wxample.com" />
-          <Field label="Password" type="password" placeholder="At least 8 characters" />
-          <button className="w-full rounded-md bg-primary py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90">
-            Create account
+        <form
+          onSubmit={handleSubmit}
+          className="mt-8 space-y-4 rounded-xl border border-border bg-card p-6"
+        >
+          <Field
+            label="Full name"
+            name="full_name"
+            value={formData.full_name}
+            onChange={handleChange}
+            placeholder="Ada Lovelace"
+          />
+          <Field
+            label="Business name"
+            name="business_name"
+            value={formData.business_name}
+            onChange={handleChange}
+            placeholder="Northwind Co."
+          />
+
+          <Field
+            label="Email"
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="you@example.com"
+          />
+          <Field
+            label="Password"
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="At least 8 characters"
+          />
+
+          {error && (
+            <p className="text-sm text-red-500">
+              {error}
+            </p>
+          )}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-md bg-primary py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
+          >
+            {loading ? "Creating account..." : "Create account"}
           </button>
           <p className="text-xs text-muted-foreground">
             By continuing you agree to PayGPT's Terms and acknowledge our Privacy Policy.
