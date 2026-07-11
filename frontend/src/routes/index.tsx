@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { PageShell } from "@/components/page-shell";
+import { PageShell } from "@/components/page-shell-home";
 import {
   ArrowRight,
   MessageSquareText,
