@@ -12,6 +12,12 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from .env
+load_dotenv(BASE_DIR / ".env")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -46,7 +52,7 @@ INSTALLED_APPS = [
 
 
     "apps.accounts",
-    # "apps.ai",
+    "apps.ai",
     "apps.invoice",
     "apps.payments",
 ]
@@ -178,3 +184,4 @@ ALATPAY_PUBLIC_KEY = os.getenv("ALATPAY_PUBLIC_KEY")
 ALATPAY_SECRET_KEY = os.getenv("ALATPAY_SECRET_KEY")
 ALATPAY_WEBHOOK_SECRET = os.getenv("ALATPAY_WEBHOOK_SECRET")
 ALATPAY_REDIRECT_URL = os.getenv("ALATPAY_REDIRECT_URL")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")

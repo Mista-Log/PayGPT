@@ -76,16 +76,6 @@ function InvoicesPage() {
     );
   }
 
-  if (error) {
-    return (
-      <PageShell>
-        <div className="p-10 text-center text-red-500">
-          {error}
-        </div>
-      </PageShell>
-    );
-  }
-
   return (
     <PageShell>
       <div className="mx-auto max-w-6xl px-6 py-12">
