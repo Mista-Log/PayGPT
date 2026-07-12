@@ -11,6 +11,7 @@ dependencies = [
     "djangorestframework-simplejwt>=5.5.1",
     "drf-spectacular>=0.29.0",
     "google-genai>=2.11.0",
+    "gunicorn>=26.0.0",
     "openai>=2.45.0",
     "pillow>=12.2.0",
     "psycopg[binary]>=3.3.4",
