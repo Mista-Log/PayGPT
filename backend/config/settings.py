@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -45,6 +46,9 @@ INSTALLED_APPS = [
 
 
     "apps.accounts",
+    # "apps.ai",
+    "apps.invoice",
+    "apps.payments",
 ]
 
 MIDDLEWARE = [
@@ -167,3 +171,10 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080",
     "http://127.0.0.1:8080",
 ]
+
+ALATPAY_BASE_URL = os.getenv("ALATPAY_BASE_URL")
+ALATPAY_BUSINESS_ID = os.getenv("ALATPAY_BUSINESS_ID")
+ALATPAY_PUBLIC_KEY = os.getenv("ALATPAY_PUBLIC_KEY")
+ALATPAY_SECRET_KEY = os.getenv("ALATPAY_SECRET_KEY")
+ALATPAY_WEBHOOK_SECRET = os.getenv("ALATPAY_WEBHOOK_SECRET")
+ALATPAY_REDIRECT_URL = os.getenv("ALATPAY_REDIRECT_URL")
