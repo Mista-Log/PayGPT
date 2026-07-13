@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+from datetime import timedelta
 import os
 from pathlib import Path
 from dotenv import load_dotenv
@@ -32,7 +33,12 @@ SECRET_KEY = 'django-insecure-41hdp0tv$p_l7nd-zyqviiu6!u@4=r%xtslufx2yu_ms-o+5q_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [
+    ".onrender.com",
+    ".vercel.app",
+    "localhost",
+    "127.0.0.1",
+]
 
 
 # Application definition
@@ -60,6 +66,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -136,6 +143,10 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+
+
 AUTH_USER_MODEL = "accounts.User"
 
 REST_FRAMEWORK = {
@@ -172,6 +183,18 @@ SPECTACULAR_SETTINGS = {
             }
         }
     },
+}
+
+SIMPLE_JWT = {
+    # Increase access token lifetime (e.g., from default 5 mins to 1 hour)
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=24),
+    
+    # Increase refresh token lifetime (e.g., from default 1 day to 7 days)
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    
+    # Optional: Automatically issue a new refresh token whenever a token is refreshed
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
 }
 
 CORS_ALLOWED_ORIGINS = [
