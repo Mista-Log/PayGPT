@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { PageShell } from "@/components/page-shell";
 import { Plus, Search, X, Trash2 } from "lucide-react";
 import { getInvoices } from "@/api/invoices";
+import { createInvoice } from "@/api/invoices";
 
 
 type Row = { id: string; client: string; amount: number; status: string; due: string };
@@ -93,9 +94,9 @@ function InvoicesPage() {
         </div>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-3">
-          <Stat label="Outstanding" value="$18,640" />
-          <Stat label="Paid this month" value="$32,910" />
-          <Stat label="Overdue" value="$980" tone="destructive" />
+          <Stat label="Outstanding" value="#00,000" />
+          <Stat label="Paid this month" value="#00,000" />
+          <Stat label="Overdue" value="#000" tone="destructive" />
         </div>
 
         <div className="mt-8 overflow-hidden rounded-xl border border-border bg-card">
@@ -131,9 +132,9 @@ function InvoicesPage() {
                 <tr key={r.id} className="hover:bg-muted/50">
                   <td className="px-4 py-3 font-medium">{r.id}</td>
                   <td className="px-4 py-3">{r.client}</td>
-                  <td className="px-4 py-3 tabular-nums">${r.amount.toLocaleString()}</td>
+                  <td className="px-4 py-3 tabular-nums">#{r.amount.toLocaleString()}</td>
                   <td className="px-4 py-3">
-                    <span className={`rounded-full px-2 py-0.5 text-xs ${statusTone[r.status]}`}>{r.status}</span>
+                    <span className={`rounded-full px-2 py-0.5 text-xs #{statusTone[r.status]}`}>{r.status}</span>
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">{r.due}</td>
                 </tr>
@@ -151,7 +152,7 @@ function InvoicesPage() {
             setRows((prev) => [row, ...prev]);
             setOpen(false);
           }}
-          nextId={`INV-${String(242 + (rows.length - initialRows.length)).padStart(4, "0")}`}
+          nextId={`INV-#{String(242 + (rows.length - initialRows.length)).padStart(4, "0")}`}
         />
       )}
     </PageShell>
@@ -168,7 +169,8 @@ function NewInvoiceDialog({
   nextId: string;
 }) {
 
-
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
 
   const [client, setClient] = useState("");
@@ -183,18 +185,39 @@ function NewInvoiceDialog({
   const updateItem = (i: number, patch: Partial<LineItem>) =>
     setItems((prev) => prev.map((it, idx) => (idx === i ? { ...it, ...patch } : it)));
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    const due = dueDate
-      ? new Date(dueDate).toLocaleDateString("en-US", { month: "short", day: "2-digit" })
-      : "—";
-    onCreate({
-      id: nextId,
-      client: client || "Untitled client",
-      amount: Math.round(total),
-      status,
-      due,
-    });
+
+    try {
+      setLoading(true);
+      setError("");
+
+      const invoice = await createInvoice({
+        customer_name: client,
+        customer_email: email,
+        amount: total,
+        description: notes,
+        due_date: dueDate,
+        payment_reference: "",
+      });
+
+      onCreate({
+        id: invoice.id,
+        client: invoice.customer_name,
+        amount: invoice.amount,
+        status: invoice.status,
+        due: new Date(invoice.due_date).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+        }),
+      });
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -209,7 +232,6 @@ function NewInvoiceDialog({
         <div className="flex items-start justify-between border-b border-border px-6 py-4">
           <div>
             <h2 className="font-display text-2xl">New invoice</h2>
-            <p className="mt-0.5 text-xs text-muted-foreground">{nextId}</p>
           </div>
           <button
             onClick={onClose}
@@ -328,9 +350,16 @@ function NewInvoiceDialog({
             <div className="text-sm">
               <span className="text-muted-foreground">Total</span>{" "}
               <span className="ml-2 font-display text-2xl tabular-nums">
-                ${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                #{total.toLocaleString(undefined, { minimumFractionDigits: 2 })}
               </span>
             </div>
+
+            {error && (
+              <p className="text-sm text-red-500">
+                {error}
+              </p>
+            )}
+
             <div className="flex gap-2">
               <button
                 type="button"
@@ -341,9 +370,10 @@ function NewInvoiceDialog({
               </button>
               <button
                 type="submit"
-                className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90"
+                disabled={loading}
+                className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-50"
               >
-                Create invoice
+                {loading ? "Creating..." : "Create invoice"}
               </button>
             </div>
           </div>
@@ -384,7 +414,7 @@ function Stat({ label, value, tone }: { label: string; value: string; tone?: "de
   return (
     <div className="rounded-xl border border-border bg-card p-5">
       <div className="text-xs uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div className={`mt-2 font-display text-3xl ${tone === "destructive" ? "text-destructive" : "text-foreground"}`}>
+      <div className={`mt-2 font-display text-3xl #{tone === "destructive" ? "text-destructive" : "text-foreground"}`}>
         {value}
       </div>
     </div>
